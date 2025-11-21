@@ -76,8 +76,9 @@ app:
 
 agent:
   type: "basic_agent"
-  model: "gpt-3.5-turbo"
-  temperature: 0.7
+  model: "gpt-5-mini"
+  temperature: 1.0
+  reasoning_effort: "minimal"
   system_prompt_file: "basic_agent.txt"
 ```
 
@@ -90,9 +91,11 @@ Edit `prompts/basic_agent.txt` to change how the agent behaves.
 ### Switching Models
 
 In `config.yaml`, change the `agent.model` field:
-- `gpt-3.5-turbo` (faster, cheaper)
-- `gpt-4` (more capable)
-- `gpt-4-turbo-preview` (balance)
+- `gpt-5` (full reasoning model)
+- `gpt-5-mini` (balanced performance and cost)
+- `gpt-5-nano` (fastest, most cost-effective)
+- `gpt-4` (previous generation)
+- `gpt-3.5-turbo` (legacy, faster but less capable)
 
 ### Adjusting Temperature
 
@@ -100,6 +103,15 @@ Set `agent.temperature` (0.0 - 2.0):
 - Lower (0.0-0.3): More focused and deterministic
 - Medium (0.5-0.8): Balanced
 - Higher (0.9-2.0): More creative and varied
+- GPT-5 models: Use 1.0 (default)
+
+### Reasoning Effort (GPT-5 Models)
+
+Set `agent.reasoning_effort` for GPT-5 models:
+- `minimal`: Fastest responses, less reasoning
+- `low`: Light reasoning for simple tasks
+- `medium`: Balanced reasoning (default)
+- `high`: Deep reasoning for complex problems
 
 ## Extending the Project
 

@@ -71,7 +71,8 @@ agent = BasicAgent(
     api_key=api_key,
     model=config["agent"]["model"],
     temperature=config["agent"]["temperature"],
-    system_prompt_path="prompts/basic_agent.txt"
+    system_prompt_path="prompts/basic_agent.txt",
+    reasoning_effort=config["agent"].get("reasoning_effort")
 )
 ```
 
@@ -85,7 +86,10 @@ The agent initializes with:
 
 ```python
 # Simplified agent initialization
-self.llm = ChatOpenAI(model=model, temperature=temperature)
+llm_params = {"model": model, "temperature": temperature}
+if reasoning_effort:
+    llm_params["reasoning_effort"] = reasoning_effort
+self.llm = ChatOpenAI(**llm_params)
 self.system_message = SystemMessage(content=prompt_from_file)
 self.conversation_history = []
 ```
@@ -121,13 +125,18 @@ import os
 
 
 class RAGAgent:
-    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo",
-                 temperature: float = 0.7, system_prompt_path: str = None):
-        self.llm = ChatOpenAI(
-            api_key=api_key,
-            model=model,
-            temperature=temperature
-        )
+    def __init__(self, api_key: str, model: str = "gpt-5-mini",
+                 temperature: float = 1.0, system_prompt_path: str = None,
+                 reasoning_effort: str = None):
+        llm_params = {
+            "api_key": api_key,
+            "model": model,
+            "temperature": temperature
+        }
+        if reasoning_effort:
+            llm_params["reasoning_effort"] = reasoning_effort
+
+        self.llm = ChatOpenAI(**llm_params)
         self.conversation_history = []
 
         # Load system prompt
@@ -188,8 +197,9 @@ Always be accurate and cite your sources.
 ```yaml
 agent:
   type: "rag_agent"  # Change this
-  model: "gpt-3.5-turbo"
-  temperature: 0.7
+  model: "gpt-5-mini"
+  temperature: 1.0
+  reasoning_effort: "minimal"
   system_prompt_file: "rag_agent.txt"  # Change this
 ```
 
@@ -309,8 +319,9 @@ app:
 # Agent configuration
 agent:
   type: "basic_agent"           # Which agent to use
-  model: "gpt-3.5-turbo"        # OpenAI model
-  temperature: 0.7               # Response randomness
+  model: "gpt-5-mini"           # OpenAI model (gpt-5, gpt-5-mini, gpt-5-nano)
+  temperature: 1.0              # Response randomness (1.0 for GPT-5)
+  reasoning_effort: "minimal"   # GPT-5 reasoning: minimal, low, medium, high
   system_prompt_file: "basic_agent.txt"  # Prompt file
 
 # API settings
@@ -381,7 +392,11 @@ model = config["agent"]["model"]
 
 1. **Test Agents Independently**: Test without UI first
    ```python
-   agent = BasicAgent(api_key="test", model="gpt-3.5-turbo")
+   agent = BasicAgent(
+       api_key="test",
+       model="gpt-5-mini",
+       reasoning_effort="minimal"
+   )
    response = agent.chat("Hello")
    print(response)
    ```
@@ -406,13 +421,18 @@ import os
 
 
 class CodeAgent:
-    def __init__(self, api_key: str, model: str = "gpt-4",
-                 temperature: float = 0.3, system_prompt_path: str = None):
-        self.llm = ChatOpenAI(
-            api_key=api_key,
-            model=model,
-            temperature=temperature
-        )
+    def __init__(self, api_key: str, model: str = "gpt-5",
+                 temperature: float = 1.0, system_prompt_path: str = None,
+                 reasoning_effort: str = "medium"):
+        llm_params = {
+            "api_key": api_key,
+            "model": model,
+            "temperature": temperature
+        }
+        if reasoning_effort:
+            llm_params["reasoning_effort"] = reasoning_effort
+
+        self.llm = ChatOpenAI(**llm_params)
 
         if system_prompt_path and os.path.exists(system_prompt_path):
             with open(system_prompt_path, 'r') as f:
@@ -440,15 +460,7 @@ class CodeAgent:
 ### 2. Create `prompts/code_agent.txt`
 
 ```
-You are an expert coding assistant specializing in Python.
-
-Your role:
-- Help users write clean, efficient code
-- Explain programming concepts
-- Debug code issues
-- Suggest best practices
-
-You have access to a Python REPL for testing code.
+You are an expert coding assistant. Help with code, debugging, and best practices.
 ```
 
 ### 3. Update `config.yaml`
@@ -456,8 +468,9 @@ You have access to a Python REPL for testing code.
 ```yaml
 agent:
   type: "code_agent"
-  model: "gpt-4"
-  temperature: 0.3
+  model: "gpt-5"
+  temperature: 1.0
+  reasoning_effort: "medium"
   system_prompt_file: "code_agent.txt"
 ```
 
