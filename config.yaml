@@ -1,0 +1,19 @@
+# GenAI Studio Configuration
+
+# Application Settings
+app:
+  title: "GenAI Studio Assistant"
+  icon: "🤖"
+  page_title: "GenAI Studio"
+
+# Agent Configuration
+agent:
+  type: "basic_agent"  # Agent to use (matches filename in agents/ directory)
+  model: "gpt-5-mini"  # OpenAI model to use (gpt-5, gpt-5-mini, gpt-5-nano)
+  temperature: 1.0
+  reasoning_effort: "minimal"  # For GPT-5: minimal, low, medium, high
+  system_prompt_file: "basic_agent.txt"  # Prompt file in prompts/ directory
+
+# API Configuration
+api:
+  provider: "openai"  # API provider (openai, anthropic, etc.)
